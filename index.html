@@ -1,0 +1,45 @@
+<!doctype html><html lang="ur" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pakistan Clan · اپنا نام</title>
+<style>
+:root{--ink:#14182b;--muted:#6b7086;--line:#e4e6ef;--accent:#1f3c88;--soft:#dde4fb;--bg:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Nastaliq Urdu",sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:20px 16px 110px}
+h1{font-size:24px;margin:4px 0 2px}.sub{color:var(--muted);margin:0 0 16px}
+label.f{display:block;font-weight:700;margin:14px 0 6px}
+input.t{width:100%;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+input.t:focus{outline:2px solid var(--accent);border-color:transparent}
+.list{margin-top:8px}.row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.row input{width:22px;height:22px;flex:none;accent-color:var(--accent)}.row img{width:40px;height:40px;flex:none}
+.row span{display:grid;min-width:0;direction:ltr;text-align:left;flex:1}.row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row small{color:var(--muted)}
+.row.on{background:var(--soft);border-radius:10px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px}
+.bar .in{max-width:520px;margin:0 auto;display:flex;gap:10px;align-items:center}
+button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:13px 18px;background:var(--accent);color:#fff;flex:1}button:disabled{opacity:.5}
+.cnt{color:var(--muted);white-space:nowrap}.msg{padding:14px;border-radius:12px;background:var(--soft);margin-top:14px}.err{background:#fde3e3}
+.done{text-align:center;padding:60px 10px}.done b{font-size:22px;display:block;margin-bottom:6px}
+</style></head><body><div class="wrap" id="app"><h1>پاکستان کلین</h1><p class="sub">لوڈ ہو رہا ہے…</p></div>
+<script>
+const SB="https://ktjsgebbqcxmdvzzuyqm.supabase.co",KEY="sb_publishable_lUyKyWN5DMx7M0AZYKNoSg_s1CsI7O7",H={apikey:KEY,Authorization:"Bearer "+KEY};
+const TH=n=>`https://raw.githubusercontent.com/ClashKingInc/ClashKingAssets/main/assets/buildings/home-village/town_hall/level_${n}.webp`;
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const $=s=>document.querySelector(s);let ACC=[],MEM={};
+async function get(c){const r=await fetch(`${SB}/rest/v1/docs?coll=eq.${c}&select=id,data`,{headers:H});if(!r.ok)throw 0;return r.json()}
+async function start(){try{const [a,m]=await Promise.all([get("accounts"),get("members")]);m.forEach(x=>MEM[x.id]=x.data.name);
+  ACC=a.map(x=>x.data).filter(d=>d.tag&&d.inClan!==false&&!d.example).sort((x,y)=>String(x.ign).localeCompare(String(y.ign)));draw()}
+  catch(_){$("#app").innerHTML=`<h1>پاکستان کلین</h1><div class="msg err">صفحہ نہیں کھل سکا۔ انٹرنیٹ چیک کر کے دوبارہ کھولیں۔</div>`}}
+function draw(){$("#app").innerHTML=`<h1>پاکستان کلین</h1><p class="sub">اپنا نام لکھیں اور اپنے سب اکاؤنٹس پر نشان لگائیں۔</p>
+  <label class="f" for="nm">آپ کا نام</label><input class="t" id="nm" maxlength="40" autocomplete="name">
+  <label class="f" for="q">اکاؤنٹ ڈھونڈیں</label><input class="t" id="q" dir="ltr" placeholder="Name or #tag" autocomplete="off">
+  <div class="list" id="list">${ACC.map(d=>`<label class="row" data-q="${esc((d.ign+" "+d.tag).toLowerCase())}"><input type="checkbox" value="${esc(d.tag)}">${d.th?`<img src="${TH(d.th)}" alt="" loading="lazy">`:""}<span><b>${esc(d.ign)}</b><small>${esc(d.tag)}${MEM[d.memberId]?" · "+esc(MEM[d.memberId]):""}</small></span></label>`).join("")}</div>
+  <div id="m"></div><div class="bar"><div class="in"><span class="cnt" id="cnt">0 اکاؤنٹ</span><button id="go">بھیجیں</button></div></div>`;
+  $("#q").oninput=e=>{const q=e.target.value.trim().toLowerCase();document.querySelectorAll(".row").forEach(r=>r.style.display=!q||r.dataset.q.includes(q)?"":"none")};
+  $("#list").onchange=()=>{const n=document.querySelectorAll(".row input:checked").length;$("#cnt").textContent=n+" اکاؤنٹ";document.querySelectorAll(".row").forEach(r=>r.classList.toggle("on",r.querySelector("input").checked))};
+  $("#go").onclick=send}
+async function send(){const name=$("#nm").value.trim(),tags=[...document.querySelectorAll(".row input:checked")].map(i=>i.value);const m=(t,e)=>{$("#m").innerHTML=`<div class="msg${e?" err":""}">${t}</div>`;$("#m").scrollIntoView({behavior:"smooth"})};
+  if(!name){m("پہلے اپنا نام لکھیں۔",1);$("#nm").focus();return}if(!tags.length){m("اپنے اکاؤنٹس پر نشان لگائیں۔",1);return}
+  const b=$("#go");b.disabled=true;b.textContent="بھیج رہے ہیں…";
+  try{const r=await fetch(`${SB}/rest/v1/rpc/owner_request`,{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({name,tags,clan:"main"})});const d=await r.json();if(!r.ok||!d.ok)throw 0;
+    $("#app").innerHTML=`<div class="done"><b>شکریہ، ${esc(name)} ✔️</b>آپ کا نام بھیج دیا گیا ہے۔ منظوری کے بعد ایپ میں آپ کے اکاؤنٹس پر نظر آئے گا۔</div>`}
+  catch(_){b.disabled=false;b.textContent="بھیجیں";m("نہیں بھیجا جا سکا۔ دوبارہ کوشش کریں۔",1)}}
+start();
+</script></body></html>
